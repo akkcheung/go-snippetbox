@@ -46,7 +46,6 @@ WHERE expires > UTC_TIMESTAMP() AND id = ?`
 		}
 	}
 
-	//return nil, nil
 	return s, nil
 }
 
@@ -78,6 +77,5 @@ WHERE expires > UTC_TIMESTAMP() ORDER BY created DESC LIMIT 10`
 		return nil, err
 	}
 
-	//return nil, nil
 	return snippets, nil
 }

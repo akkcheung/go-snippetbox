@@ -40,38 +40,16 @@ func main() {
 		snippets: &mysql.SnippetModel{DB: db},
 	}
 
-	//mux := http.NewServeMux()
-
-	//mux.HandleFunc("/", home)
-	//mux.HandleFunc("/", app.home)
-
-	//mux.HandleFunc("/snippet", showSnippet)
-	//mux.HandleFunc("/snippet", app.showSnippet)
-
-	//mux.HandleFunc("/snippet/create", createSnippet)
-	//mux.HandleFunc("/snippet/create", app.createSnippet)
-
-	//fileServer := http.FileServer(http.Dir("./ui/static/"))
-	//mux.Handle("/static/", http.StripPrefix("/static", fileServer))
-
 	srv := &http.Server{
 		Addr:     *addr,
 		ErrorLog: errorLog,
-		//Handler:  mux,
-		Handler: app.routes(),
+		Handler:  app.routes(),
 	}
 
-	//log.Println("Starting server on :4000")
-	//log.Printf("Starting server on %s", *addr)
 	infoLog.Printf("Starting server on %s", *addr)
 
-	//err := http.ListenAndServe(":4000", mux)
-	//err := http.ListenAndServe(*addr, mux)
 	err = srv.ListenAndServe()
 
-	//handler := cors.Default().Handler(mux)
-	//err := http.ListenAndServe(":4000", handler)
-	//log.Fatal(err)
 	errorLog.Fatal(err)
 
 }
