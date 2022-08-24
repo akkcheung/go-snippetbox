@@ -7,16 +7,13 @@ import (
 	"strconv"
 
 	"github.com/akkcheung/go-snippetbox/pkg/models"
+	"github.com/gorilla/mux"
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 
-	if r.URL.Path != "/" {
-		app.notFound(w)
-		return
-	}
-
-	//	panic("oops! something went wrong") // Deliberate panic
+	//debug
+	//fmt.Printf("-> home")
 
 	s, err := app.snippets.Latest()
 	if err != nil {
@@ -31,7 +28,13 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 
-	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	vars := mux.Vars(r)
+
+	//debug
+	//fmt.Printf("%s", vars["id"])
+
+	id, err := strconv.Atoi(vars["id"])
+
 	if err != nil || id < 1 {
 		app.notFound(w)
 		return
