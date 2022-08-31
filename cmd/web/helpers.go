@@ -29,6 +29,8 @@ func (app *application) addDefaultData(td *templateData, r *http.Request) *templ
 		td = &templateData{}
 	}
 	td.CurrentYear = time.Now().Year()
+	//Add the flash message to the template data, if one exist
+	td.Flash = app.session.PopString(r, "flash")
 	return td
 }
 
@@ -42,8 +44,6 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, name stri
 	// initialize a new buffer.
 	buf := new(bytes.Buffer)
 
-	//err := ts.Execute(w, td)
-	//err := ts.Execute(buf, td)
 	err := ts.Execute(buf, app.addDefaultData(td, r))
 	if err != nil {
 		app.serverError(w, err)

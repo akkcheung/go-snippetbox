@@ -16,7 +16,8 @@ type templateData struct {
 
 	//FormData   url.Values
 	//FormErrors map[string]string
-	Form *forms.Form
+	Form  *forms.Form
+	Flash string
 }
 
 func newTemplateCache(dir string) (map[string]*template.Template, error) {

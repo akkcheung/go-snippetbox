@@ -17,6 +17,12 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	//debug
 	//fmt.Printf("-> home")
 
+	app.render(w, r, "home.page.tmpl", nil)
+
+}
+
+func (app *application) all(w http.ResponseWriter, r *http.Request) {
+
 	s, err := app.snippets.Latest()
 	if err != nil {
 		app.serverError(w, err)
@@ -25,7 +31,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 
 	data := &templateData{Snippets: s}
 
-	app.render(w, r, "home.page.tmpl", data)
+	app.render(w, r, "all.page.tmpl", data)
 }
 
 func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
@@ -52,7 +58,13 @@ func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//flash := app.session.PopString(r, "flash")
+
+	//debug
+	//fmt.Printf("flash -> %s", flash)
+
 	app.render(w, r, "show.page.tmpl", &templateData{
+		//Flash:   flash,
 		Snippet: s,
 	})
 
@@ -71,37 +83,6 @@ func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//	title := r.PostForm.Get("title")
-	//	content := r.PostForm.Get("content")
-	//	expires := r.PostForm.Get("expires")
-	//
-	//	errors := make(map[string]string)
-	//
-	//	if strings.TrimSpace(title) == "" {
-	//		errors["title"] = "This field cannot be blank"
-	//	} else if utf8.RuneCountInString(title) > 100 {
-	//		errors["title"] = "This field is too long (maximum is 100 characters"
-	//	}
-	//
-	//	if strings.TrimSpace(content) == "" {
-	//		errors["content"] = "This field cannot be blank"
-	//	}
-	//
-	//	if strings.TrimSpace(expires) == "" {
-	//		errors["expires"] = "This field cannot be blank"
-	//	} else if expires != "365" && expires != "7" && expires != "1" {
-	//		errors["expires"] = "This field is invalid"
-	//	}
-	//
-	//	if len(errors) > 0 {
-	//		app.render(w, r, "create.page.tmpl", &templateData{
-	//			FormErrors: errors,
-	//			FormData:   r.PostForm,
-	//		})
-	//		return
-	//	}
-	//
-
 	form := forms.New(r.PostForm)
 	form.Required("title", "content", "expires")
 	form.MaxLength("title", 100)
@@ -112,12 +93,13 @@ func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//id, err := app.snippets.Insert(title, content, expires)
 	id, err := app.snippets.Insert(form.Get("title"), form.Get("content"), form.Get("expires"))
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
+
+	app.session.Put(r, "flash", "Snippet successfully created")
 
 	http.Redirect(w, r, fmt.Sprintf("/snippet/%d", id), http.StatusSeeOther)
 }

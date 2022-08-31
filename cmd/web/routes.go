@@ -9,12 +9,20 @@ import (
 func (app *application) routes() http.Handler {
 	r := mux.NewRouter()
 
+	s := r.PathPrefix("/snippet").Subrouter()
+	s.Use(secureHeaders, app.logRequest, app.recoverPanic)
+
 	r.HandleFunc("/", app.home).Methods("GET")
-	r.HandleFunc("/snippet/create", app.createSnippetForm).Methods("GET")
-	r.HandleFunc("/snippet/create", app.createSnippet).Methods("POST")
-	r.HandleFunc("/snippet/{id}", app.showSnippet).Methods("GET")
+
+	s.HandleFunc("/all", app.all).Methods("GET")
+	s.HandleFunc("/create", app.createSnippetForm).Methods("GET")
+	s.HandleFunc("/create", app.createSnippet).Methods("POST")
+	s.HandleFunc("/{id}", app.showSnippet).Methods("GET")
 
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./ui/static/"))))
 
-	return app.recoverPanic(app.logRequest(secureHeaders(r)))
+	r.Use(secureHeaders, app.logRequest, app.recoverPanic, app.session.Enable)
+	s.Use(app.session.Enable)
+
+	return r
 }
